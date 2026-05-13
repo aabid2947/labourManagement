@@ -1,0 +1,88 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+Thumbs.db
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# ─── Flutter / Dart / Pub ─────────────────────────────────────────────────
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+# Build outputs at any depth.
+**/build/
+/coverage/
+
+# ─── Symbolication / obfuscation ──────────────────────────────────────────
+app.*.symbols
+app.*.map.json
+
+# ─── Android ──────────────────────────────────────────────────────────────
+# Local SDK path / per-machine config — never commit.
+/android/local.properties
+android/.gradle/
+**/.gradle/
+**/.cxx/
+# Android Studio build outputs.
+/android/app/debug
+/android/app/profile
+/android/app/release
+# Signing keys — DO NOT COMMIT.
+**/*.jks
+**/*.keystore
+android/key.properties
+android/app/google-services.json
+
+# ─── iOS / macOS ──────────────────────────────────────────────────────────
+**/Pods/
+**/Podfile.lock
+**/DerivedData/
+**/xcuserdata/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+GoogleService-Info.plist
+
+# ─── Secrets & env ────────────────────────────────────────────────────────
+.env
+.env.*
+*.pem
+*.p12
+secrets/
+
+# ─── Python scratch (tools.py is committed; cache isn't) ──────────────────
+__pycache__/
+
+# ─── Editor / OS noise ────────────────────────────────────────────────────
+*.bak
+*~
