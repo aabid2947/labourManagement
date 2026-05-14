@@ -189,11 +189,13 @@ class _TaskTable extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 8.w),
       child: Row(
         children: [
-          _headerCell('Task Date', flex: 24),
-          _headerCell('Task Title', flex: 28),
-          _headerCell('Aging', flex: 16, center: true),
-          _headerCell('Status', flex: 20, center: true),
-          _headerCell('Remark', flex: 12, center: true),
+          // Column flex totals 100. "Action" is given enough width to render
+          // on one line on a 360-wide phone; other columns are nudged in by 2.
+          _headerCell('Task Date', flex: 23),
+          _headerCell('Task Title', flex: 26),
+          _headerCell('Aging', flex: 14, center: true),
+          _headerCell('Status', flex: 19, center: true),
+          _headerCell('Action', flex: 18, center: true),
         ],
       ),
     );
@@ -204,10 +206,18 @@ class _TaskTable extends StatelessWidget {
       flex: flex,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 4.w),
-        child: Text(
-          label,
-          textAlign: center ? TextAlign.center : TextAlign.start,
-          style: AppTextStyles.bodyBold.copyWith(fontSize: 12.sp),
+        // FittedBox scales the label down rather than wrapping if the column
+        // is narrower than the text — guarantees one-line rendering.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment:
+              center ? Alignment.center : Alignment.centerLeft,
+          child: Text(
+            label,
+            maxLines: 1,
+            softWrap: false,
+            style: AppTextStyles.bodyBold.copyWith(fontSize: 12.sp),
+          ),
         ),
       ),
     );
@@ -221,7 +231,7 @@ class _TaskTable extends StatelessWidget {
         children: [
           // Task Date column — assigned + due stacked.
           Expanded(
-            flex: 24,
+            flex: 23,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 4.w),
               child: Column(
@@ -240,7 +250,7 @@ class _TaskTable extends StatelessWidget {
           ),
           // Task Title — title + tiny "view" icon below.
           Expanded(
-            flex: 28,
+            flex: 26,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 4.w),
               child: Column(
@@ -275,17 +285,17 @@ class _TaskTable extends StatelessWidget {
           ),
           // Aging pill
           Expanded(
-            flex: 16,
+            flex: 14,
             child: Center(child: _agingPill(t.agingDays)),
           ),
           // Status pill
           Expanded(
-            flex: 20,
+            flex: 19,
             child: Center(child: _statusPill(t.status)),
           ),
           // Action — arrow → remark
           Expanded(
-            flex: 12,
+            flex: 18,
             child: Center(
               child: InkWell(
                 borderRadius: BorderRadius.circular(20.r),

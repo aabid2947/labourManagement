@@ -77,82 +77,85 @@ class MyExpenseScreen extends ConsumerWidget {
   }
 
   Widget _summaryCard(AsyncValue<ExpenseSummary> async) {
+    // Yellow left accent painted inside a rounded clip — Flutter forbids
+    // non-uniform border colors with a borderRadius, so the stripe lives
+    // INSIDE the clipped Container next to the padded content row.
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: AppColors.cardBorder),
       ),
+      clipBehavior: Clip.antiAlias,
+      // Stack lets the yellow stripe span the full card height via
+      // Positioned(top/bottom: 0). IntrinsicHeight + Row(stretch) was
+      // collapsing the bare 5-wide Container to 0 height.
       child: Stack(
         children: [
-          // Yellow left accent bar.
-          Positioned.fill(
-            left: -14,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                width: 4.w,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.horizontal(right: Radius.circular(4.r)),
+          Padding(
+            padding: EdgeInsets.fromLTRB(19.w, 14.h, 14.w, 14.h),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'TOTAL EXPENSE',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                          letterSpacing: 0.8,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 6.h),
+                      Text(
+                        async.maybeWhen(
+                          data: (s) => Formatters.currency(s.total),
+                          orElse: () => '—',
+                        ),
+                        style: AppTextStyles.screenTitle
+                            .copyWith(fontSize: 28.sp),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 12.w, vertical: 8.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.book_outlined,
+                          color: AppColors.textOnPrimary, size: 16.sp),
+                      SizedBox(width: 6.w),
+                      Text(
+                        async.maybeWhen(
+                          data: (s) => '${s.pendingCount} PENDING',
+                          orElse: () => '— PENDING',
+                        ),
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textOnPrimary,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'TOTAL EXPENSE',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textSecondary,
-                        letterSpacing: 0.8,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 6.h),
-                    Text(
-                      async.maybeWhen(
-                        data: (s) => Formatters.currency(s.total),
-                        orElse: () => '—',
-                      ),
-                      style: AppTextStyles.screenTitle.copyWith(fontSize: 28.sp),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.book_outlined,
-                        color: AppColors.textOnPrimary, size: 16.sp),
-                    SizedBox(width: 6.w),
-                    Text(
-                      async.maybeWhen(
-                        data: (s) => '${s.pendingCount} PENDING',
-                        orElse: () => '— PENDING',
-                      ),
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textOnPrimary,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(width: 5.w, color: AppColors.todaysTaskBg),
           ),
         ],
       ),
@@ -267,18 +270,23 @@ class MyExpenseScreen extends ConsumerWidget {
   }
 
   Widget _bottomRow(BuildContext context, WidgetRef ref) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        _PlusButton(
-          onTap: () => context.push(RouteNames.addExpense),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: PrimaryButton(
-            label: 'CLAIM NOW',
-            icon: Icons.send_rounded,
-            onPressed: () => _onClaim(context, ref),
+        // `+` sits on its own row, right-aligned, above the full-width CTA —
+        // matches the page36 design.
+        Align(
+          alignment: Alignment.centerRight,
+          child: _PlusButton(
+            onTap: () => context.push(RouteNames.addExpense),
           ),
+        ),
+        SizedBox(height: 10.h),
+        PrimaryButton(
+          label: 'CLAIM NOW',
+          icon: Icons.send_rounded,
+          onPressed: () => _onClaim(context, ref),
         ),
       ],
     );

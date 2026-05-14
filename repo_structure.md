@@ -456,6 +456,23 @@ features/profile/
   block, placed above the View/Self Attendance toggle row per the brief.
 - **Status:** `flutter analyze` zero issues; `flutter test` 26/26 green.
 
+### Bug fix pass 6 — Dashboard tweaks (review pass after bug-fix 3)
+- **Today's Task tile** — base background recolored from `AppColors.primary`
+  (`#FFB300`) to a softer `AppColors.todaysTaskBg` (`#FFDB6B`). The pulsing
+  glow uses the same softer color so the animation stays in family. New
+  token added to `AppColors`.
+- **Top bar — hamburger restored.** Bug-fix pass 3 had replaced the
+  hamburger with a tappable `UserAvatar`. The client reversed that call in
+  the review pass — the top bar now shows `Icons.menu` again, still tapped
+  to open the same `Scaffold.drawer`. The avatar lives on inside the drawer
+  header and on the Total Labour Strength tile.
+- **Greeting wraps instead of ellipsising.** The greeting `Text` lost its
+  `maxLines: 1` + `overflow: ellipsis` pair; now `softWrap: true` so a long
+  `Good Morning, <name>` breaks to a second line on narrow widths instead
+  of truncating. `Row.crossAxisAlignment` is `start` so the Change Site
+  pill aligns to the top of the wrapped text.
+- **Status:** `flutter analyze` zero issues; `flutter test` 26/26 green.
+
 ### Bug fix pass 5 — Profile screen
 - **New feature module** `features/profile/` with the standard data /
   presentation / providers layout (see folder tree above).

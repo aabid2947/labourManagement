@@ -66,11 +66,11 @@ class _TodaysTaskTileState extends State<TodaysTaskTile>
                       padding: EdgeInsets.symmetric(
                           horizontal: 14.w, vertical: 12.h),
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
+                        color: AppColors.todaysTaskBg,
                         borderRadius: BorderRadius.circular(14.r),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary
+                            color: AppColors.todaysTaskBg
                                 .withValues(alpha: _glow.value),
                             blurRadius: 18,
                             spreadRadius: 1,

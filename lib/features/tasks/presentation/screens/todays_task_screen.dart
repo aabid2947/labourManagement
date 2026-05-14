@@ -159,57 +159,62 @@ class _TodayRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(14.r);
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: radius,
         onTap: onTap,
+        // The yellow left stripe is painted as an inner ColoredBox clipped by
+        // the card's rounded shape. Flutter forbids non-uniform border colors
+        // with a borderRadius, so the stripe lives INSIDE the rounded clip.
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: radius,
             border: Border.all(color: AppColors.cardBorder),
           ),
-          padding: EdgeInsets.fromLTRB(14.w, 14.h, 14.w, 14.h),
-          child: Row(
+          clipBehavior: Clip.antiAlias,
+          // Stack lets the yellow stripe span the full card height via
+          // Positioned(top/bottom: 0). IntrinsicHeight + Row(stretch) was
+          // collapsing the bare 4-wide Container to 0 height because it has
+          // no intrinsic height of its own.
+          child: Stack(
             children: [
-              // Yellow left accent.
-              Container(
-                width: 3.w,
-                height: 48.h,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 14.h, 14.w, 14.h),
+                child: Row(
                   children: [
-                    Text(task.title,
+                    Expanded(
+                      child: Text(
+                        task.title,
                         style: AppTextStyles.bodyBold
-                            .copyWith(fontSize: 15.sp)),
-                    SizedBox(height: 4.h),
-                    Text(task.summary,
-                        style: AppTextStyles.caption,
+                            .copyWith(fontSize: 15.sp),
                         maxLines: 2,
-                        overflow: TextOverflow.ellipsis),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(width: 10.w),
+                    Container(
+                      width: 36.w,
+                      height: 36.w,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: AppColors.primary, width: 1.2),
+                      ),
+                      child: Icon(Icons.chevron_right_rounded,
+                          color: AppColors.primaryDark, size: 22.sp),
+                    ),
                   ],
                 ),
               ),
-              SizedBox(width: 10.w),
-              Container(
-                width: 36.w,
-                height: 36.w,
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.primary, width: 1.2),
-                ),
-                child: Icon(Icons.chevron_right_rounded,
-                    color: AppColors.primaryDark, size: 22.sp),
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Container(width: 4.w, color: AppColors.todaysTaskBg),
               ),
             ],
           ),

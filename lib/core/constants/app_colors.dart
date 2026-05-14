@@ -11,6 +11,9 @@ class AppColors {
   static const Color primaryDark = Color(0xFFF5A300);
   static const Color primarySoft = Color(0xFFFFF3D6); // pill backgrounds, soft accents
   static const Color avatarBg = Color(0xFFFFEFD6);    // labour avatar circle background
+  /// Softer yellow used specifically on the dashboard's TODAY'S TASK banner —
+  /// the client picked this shade in the latest review pass.
+  static const Color todaysTaskBg = Color(0xFFFFDB6B);
 
   // Surfaces
   static const Color background = Color(0xFFF7F8FA);

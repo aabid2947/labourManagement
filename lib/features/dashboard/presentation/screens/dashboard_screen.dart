@@ -101,13 +101,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       child: Row(
         children: [
-          // Tappable profile avatar opens the side drawer (Bug fix pass 3 —
-          // replaces the old `Icons.menu` hamburger).
-          GestureDetector(
-            onTap: () => _scaffoldKey.currentState?.openDrawer(),
-            child: const UserAvatar(radius: 18),
+          // Hamburger opens the same side drawer the avatar previously did.
+          // Reverted to match page10_img01 — the three lines sit to the left
+          // of the "You / Just now" stack.
+          IconButton(
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            constraints: BoxConstraints(minWidth: 32.w, minHeight: 32.w),
+            icon: Icon(Icons.menu, size: 24.sp, color: AppColors.textPrimary),
+            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 8.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -156,12 +160,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   // ───────────────────────────────────────────────────── greeting + change site
   Widget _greetingRow() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Text(
             'Good Morning, $_kPlaceholderUserName',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            // Soft-wrap on overflow instead of ellipsising — per the latest
+            // client tweak, the greeting should break to a second line
+            // (e.g. "Good Morning,\nAlexander") rather than truncate.
+            softWrap: true,
             style: AppTextStyles.screenTitle,
           ),
         ),
@@ -302,60 +309,73 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ? 0.0
         : summary.attendancePresent / summary.attendanceTotal;
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 12.h,
-      crossAxisSpacing: 12.w,
-      childAspectRatio: 1.45,
+    final totalLabour = MetricCard(
+      icon: Icons.people_alt_outlined,
+      iconBg: AppColors.primarySoft,
+      iconColor: AppColors.primaryDark,
+      iconWidget: const UserAvatar(radius: 18),
+      value: summary == null ? '—' : '${summary.totalLabour}',
+      label: 'Total Labour Strength',
+      onTap: () => context.push(RouteNames.labourList),
+    );
+    final todayAttendance = MetricCard(
+      icon: Icons.calendar_month_outlined,
+      iconBg: const Color(0xFFE3EBFB),
+      iconColor: AppColors.info,
+      valueColor: AppColors.info,
+      value: summary == null
+          ? '—'
+          : '${summary.attendancePresent}/${summary.attendanceTotal}',
+      label: 'Today Attendance',
+      progress: attendancePct,
+      progressColor: AppColors.info,
+      onTap: () => context.push(RouteNames.labourIn),
+    );
+    final myExpense = MetricCard(
+      icon: Icons.account_balance_wallet_outlined,
+      iconBg: const Color(0xFFEFEFEF),
+      iconColor: AppColors.textPrimary,
+      subtitle: expense == null
+          ? ''
+          : 'Adv :- ${Formatters.currency(expense.advance)}',
+      value: expense == null ? '—' : Formatters.currency(expense.total),
+      label: 'My Expense',
+      onTap: () => context.push(RouteNames.myExpense),
+    );
+    final taskVsAch = MetricCard(
+      icon: Icons.insights_outlined,
+      iconBg: const Color(0xFFFDE7E7),
+      iconColor: AppColors.error,
+      value: summary == null
+          ? '—'
+          : '${summary.taskAchieved}/${summary.taskTarget}',
+      label: 'Task Vs Achievements',
+      onTap: () => context.push(RouteNames.taskVsAchievements),
+    );
+
+    // Each row is IntrinsicHeight + Row(crossAxisAlignment.stretch) so the two
+    // cards inside share the height of the taller one's content. Replaces the
+    // old GridView.count(childAspectRatio: 1.1) which gave every card the same
+    // fixed height regardless of how much content it actually had — that's
+    // where the empty space under shorter cards came from.
+    Widget pair(Widget left, Widget right) {
+      return IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: left),
+            SizedBox(width: 12.w),
+            Expanded(child: right),
+          ],
+        ),
+      );
+    }
+
+    return Column(
       children: [
-        MetricCard(
-          icon: Icons.people_alt_outlined,
-          iconBg: AppColors.primarySoft,
-          iconColor: AppColors.primaryDark,
-          // Bug fix pass 3 — client asked for the user's photo in this slot.
-          // Falls back to a soft-yellow person glyph until the backend ships
-          // a profile photo URL.
-          iconWidget: const UserAvatar(radius: 18),
-          value: summary == null ? '—' : '${summary.totalLabour}',
-          label: 'Total Labour Strength',
-          onTap: () => context.push(RouteNames.labourList),
-        ),
-        MetricCard(
-          icon: Icons.calendar_month_outlined,
-          iconBg: const Color(0xFFE3EBFB),
-          iconColor: AppColors.info,
-          valueColor: AppColors.info,
-          value: summary == null
-              ? '—'
-              : '${summary.attendancePresent}/${summary.attendanceTotal}',
-          label: 'Today Attendance',
-          progress: attendancePct,
-          progressColor: AppColors.info,
-          // Bug fix pass 4 — client redirected this tile to Labour In.
-          onTap: () => context.push(RouteNames.labourIn),
-        ),
-        MetricCard(
-          icon: Icons.account_balance_wallet_outlined,
-          iconBg: const Color(0xFFEFEFEF),
-          iconColor: AppColors.textPrimary,
-          subtitle:
-              expense == null ? '' : 'Adv :- ${Formatters.currency(expense.advance)}',
-          value: expense == null ? '—' : Formatters.currency(expense.total),
-          label: 'My Expense',
-          onTap: () => context.push(RouteNames.myExpense),
-        ),
-        MetricCard(
-          icon: Icons.insights_outlined,
-          iconBg: const Color(0xFFFDE7E7),
-          iconColor: AppColors.error,
-          value: summary == null
-              ? '—'
-              : '${summary.taskAchieved}/${summary.taskTarget}',
-          label: 'Task Vs Achievements',
-          onTap: () => context.push(RouteNames.taskVsAchievements),
-        ),
+        pair(totalLabour, todayAttendance),
+        SizedBox(height: 12.h),
+        pair(myExpense, taskVsAch),
       ],
     );
   }
